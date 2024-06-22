@@ -3,6 +3,12 @@ from django.contrib.auth.decorators import login_required
 from item.models import Item
 from .forms import NewItemForm, EditItemForm
 # Create your views here.
+def browse(request):
+    items = Item.objects.filter(is_sold=False)
+    return render(request, 'item/browse.html', {'items':items})
+
+
+
 def detail(request, pk):
     item = get_object_or_404(Item, pk=pk)
     related_items = Item.objects.filter(category=item.category, is_sold=False).exclude(pk=pk)[0:3]
@@ -11,6 +17,7 @@ def detail(request, pk):
         'item': item,
         'related_items': related_items
     })
+
 
 @login_required
 def new(request):
@@ -25,6 +32,7 @@ def new(request):
         form = NewItemForm()
         return render(request, 'item/form.html', {'form':form, 'title':"New Item"})
 
+
 @login_required
 def edit(request, pk):
     item = get_object_or_404(Item, pk=pk, created_by = request.user)
@@ -38,7 +46,6 @@ def edit(request, pk):
 
         return render(request, 'item/form.html', {'form':form, 'title':"Edit Item"})
     
-
 
 @login_required
 def delete(request, pk):
